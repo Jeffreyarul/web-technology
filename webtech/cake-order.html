@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cake Order Calculator</title>
+    <!-- Load Tailwind CSS for modern styling and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load jQuery for dynamic calculations -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%); /* Light pastel yellow/cream background */
+        }
+        .order-card {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="order-card w-full max-w-xl p-8 sm:p-12 rounded-2xl shadow-xl border-t-8 border-pink-400">
+        <h1 class="text-3xl font-extrabold text-center text-pink-600 mb-8 tracking-wide">
+            🍰 Custom Cake Order
+        </h1>
+
+        <form id="cake-order-form" class="space-y-6">
+
+            <!-- 1. Size Selection (Dropdown) -->
+            <div>
+                <label for="cake-size" class="block text-lg font-semibold text-gray-700 mb-2">Cake Size</label>
+                <select id="cake-size" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 text-base shadow-sm">
+                    <option value="25.00" data-size="8" selected>8 inch (Small) - $25.00</option>
+                    <option value="35.00" data-size="10">10 inch (Medium) - $35.00</option>
+                    <option value="50.00" data-size="12">12 inch (Large) - $50.00</option>
+                </select>
+            </div>
+
+            <!-- 2. Flavor Selection (Dropdown) -->
+            <div>
+                <label for="cake-flavor" class="block text-lg font-semibold text-gray-700 mb-2">Flavor</label>
+                <select id="cake-flavor" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 text-base shadow-sm">
+                    <option value="0.00" selected>Classic Vanilla</option>
+                    <option value="0.00">Rich Chocolate</option>
+                    <option value="5.00">Velvet Red (+ $5.00)</option>
+                    <option value="7.50">Lemon Raspberry (+ $7.50)</option>
+                </select>
+            </div>
+
+            <!-- 3. Quantity -->
+            <div>
+                <label for="quantity" class="block text-lg font-semibold text-gray-700 mb-2">Quantity</label>
+                <input 
+                    type="number" 
+                    id="quantity" 
+                    value="1" 
+                    min="1"
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-pink-500 focus:border-pink-500 text-base shadow-sm"
+                >
+            </div>
+
+            <!-- 4. Toppings/Extras (Checkboxes) -->
+            <div class="pt-4 border-t border-gray-200">
+                <p class="text-lg font-semibold text-gray-700 mb-3">Extra Toppings</p>
+                <div class="space-y-2">
+                    <label class="flex items-center space-x-3 text-gray-600">
+                        <input type="checkbox" name="extra" value="5.00" class="h-5 w-5 text-pink-600 rounded focus:ring-pink-500">
+                        <span>Fruit Topping (Seasonal) - $5.00</span>
+                    </label>
+                    <label class="flex items-center space-x-3 text-gray-600">
+                        <input type="checkbox" name="extra" value="10.00" class="h-5 w-5 text-pink-600 rounded focus:ring-pink-500">
+                        <span>Custom Icing Message - $10.00</span>
+                    </label>
+                    <label class="flex items-center space-x-3 text-gray-600">
+                        <input type="checkbox" name="extra" value="2.00" class="h-5 w-5 text-pink-600 rounded focus:ring-pink-500">
+                        <span>Birthday Candles Set - $2.00</span>
+                    </label>
+                </div>
+            </div>
+            
+        </form>
+
+        <!-- Total Display -->
+        <div class="mt-8 p-6 rounded-xl bg-pink-100 border-l-4 border-pink-600 shadow-inner">
+            <p class="text-xl font-medium text-pink-800 mb-2">Estimated Total</p>
+            <p id="total-price" class="text-5xl font-extrabold text-pink-700 tracking-tighter">
+                $25.00
+            </p>
+        </div>
+        
+        <!-- Error Display -->
+        <div id="error-message" class="hidden mt-4 p-3 rounded-lg bg-red-100 border-l-4 border-red-500 text-red-700 text-sm font-medium">
+            <!-- Error messages will appear here -->
+        </div>
+    </div>
+
+    <!-- jQuery Calculation Logic -->
+    <script>
+        /**
+         * Calculates the total price of the cake order based on all selected options.
+         * This function uses jQuery to read the values dynamically.
+         */
+        function calculateOrder() {
+            let basePrice = 0;
+            let flavorSurcharge = 0;
+            let extrasCost = 0;
+            
+            // 1. Get Base Price (from Size dropdown)
+            // Use parseFloat to convert the string value of the selected option to a number
+            basePrice = parseFloat($('#cake-size').val());
+
+            // 2. Get Flavor Surcharge
+            flavorSurcharge = parseFloat($('#cake-flavor').val());
+            
+            // 3. Get Quantity and Validate
+            let quantity = parseInt($('#quantity').val());
+
+            // Handle invalid/negative quantity
+            if (isNaN(quantity) || quantity <= 0) {
+                $('#error-message').text('Please enter a valid quantity (1 or more).').removeClass('hidden');
+                $('#total-price').text('$0.00');
+                return;
+            } else {
+                $('#error-message').addClass('hidden');
+            }
+
+            // 4. Calculate Extras Cost (Toppings Checkboxes)
+            // Use jQuery's :checked selector and .each() to iterate over selected checkboxes
+            $('input[name="extra"]:checked').each(function() {
+                extrasCost += parseFloat($(this).val());
+            });
+
+            // 5. Calculate Total
+            const itemTotal = basePrice + flavorSurcharge + extrasCost;
+            const finalTotal = itemTotal * quantity;
+
+            // 6. Display Result
+            $('#total-price').text('$' + finalTotal.toFixed(2));
+        }
+
+        // --- jQuery Document Ready & Event Binding ---
+        $(document).ready(function() {
+            // Attach the calculateOrder function to all relevant change/input events
+            $('#cake-size, #cake-flavor, #quantity, input[name="extra"]').on('change input', calculateOrder);
+            
+            // Initial calculation when the page loads
+            calculateOrder();
+        });
+    </script>
+
+</body>
+</html>
