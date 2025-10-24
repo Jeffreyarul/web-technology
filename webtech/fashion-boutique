@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fashion Boutique | Home</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav>
+    <div class="logo">FashionBoutique</div>
+    <ul>
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="login.html">Login</a></li>
+    </ul>
+  </nav>
+
+  <section class="landing">
+    <div class="landing-content">
+      <h1>Discover Your Signature Style</h1>
+      <p>Shop the latest fashion trends curated just for you.</p>
+      <a href="login.html" class="btn">Shop Now</a>
+    </div>
+  </section>
+
+  <footer>
+    &copy; 2025 Fashion Boutique | All Rights Reserved
+  </footer>
+
+</body>
+</html>
