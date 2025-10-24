@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Calculator</title>
+    <!-- Load Tailwind CSS for modern styling and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load jQuery for dynamic calculations -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%); /* Teal gradient background */
+        }
+        .calculator-card {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="calculator-card w-full max-w-lg p-8 sm:p-12 rounded-2xl shadow-2xl border-t-8 border-teal-600">
+        <h1 class="text-3xl font-extrabold text-center text-teal-700 mb-8 tracking-wide">
+            Tax/GST Calculator
+        </h1>
+
+        <div id="gst-form" class="space-y-6">
+
+            <!-- 1. Amount Input (Base Price) -->
+            <div>
+                <label for="amount-input" class="block text-lg font-semibold text-gray-700 mb-2">Base Amount (Price without Tax)</label>
+                <input 
+                    type="number" 
+                    id="amount-input" 
+                    value="1000.00" 
+                    min="0.01"
+                    step="0.01"
+                    placeholder="Enter amount" 
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 text-xl shadow-sm"
+                >
+            </div>
+
+            <!-- 2. GST Rate Selection (Dropdown) -->
+            <div>
+                <label for="gst-rate" class="block text-lg font-semibold text-gray-700 mb-2">Select GST Rate</label>
+                <select id="gst-rate" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500 text-lg shadow-sm appearance-none bg-white">
+                    <option value="5">5%</option>
+                    <option value="12">12%</option>
+                    <option value="18" selected>18%</option>
+                    <option value="28">28%</option>
+                </select>
+            </div>
+            
+        </div>
+
+        <!-- Result Display -->
+        <div class="mt-8 pt-4 border-t border-gray-200 space-y-4">
+            <h2 class="text-2xl font-bold text-gray-800">Calculation Details</h2>
+            
+            <!-- Actual Amount (Base Price) -->
+            <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                <p class="text-lg font-medium text-gray-600">Actual Amount (Base Price)</p>
+                <p id="actual-amount-display" class="text-xl font-bold text-gray-800">
+                    $0.00
+                </p>
+            </div>
+
+            <!-- GST Amount -->
+            <div class="flex justify-between items-center p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
+                <p class="text-lg font-medium text-gray-600">GST Amount</p>
+                <p id="gst-amount-display" class="text-xl font-bold text-yellow-700">
+                    $0.00
+                </p>
+            </div>
+
+            <!-- Total Amount -->
+            <div class="flex justify-between items-center p-4 bg-teal-100 rounded-lg border-l-4 border-teal-600">
+                <p class="text-xl font-bold text-teal-800">Total Amount (Incl. GST)</p>
+                <p id="total-amount-display" class="text-3xl font-extrabold text-teal-700">
+                    $0.00
+                </p>
+            </div>
+        </div>
+        
+        <!-- Error Display -->
+        <div id="error-message" class="hidden mt-4 p-3 rounded-lg bg-red-100 border-l-4 border-red-500 text-red-700 text-sm font-medium">
+            <!-- Error messages will appear here -->
+        </div>
+    </div>
+
+    <!-- jQuery Calculation Logic -->
+    <script>
+        /**
+         * Calculates the GST, Actual Amount, and Total Amount dynamically.
+         * Uses jQuery actions: .val(), .text(), .addClass(), .removeClass().
+         */
+        function calculateGST() {
+            // 1. Read Inputs using jQuery .val()
+            // The input field is assumed to be the Base Amount (Actual Amount)
+            const amountInput = $('#amount-input');
+            const rateInput = $('#gst-rate');
+            
+            const amount = parseFloat(amountInput.val());
+            const rate = parseFloat(rateInput.val()); // e.g., 18 for 18%
+
+            // Get display elements
+            const errorElement = $('#error-message');
+            
+            // Handle error display
+            if (isNaN(amount) || amount < 0) {
+                errorElement.text('Please enter a valid amount greater than zero.');
+                errorElement.removeClass('hidden'); // Show error using .removeClass()
+                
+                // Clear displays on error
+                $('#actual-amount-display').text('$0.00');
+                $('#gst-amount-display').text('$0.00');
+                $('#total-amount-display').text('$0.00');
+                return;
+            } else {
+                errorElement.addClass('hidden'); // Hide error using .addClass()
+            }
+
+            // 2. Calculation
+            const gstRateDecimal = rate / 100;
+            
+            const actualAmount = amount; // Base price is the input amount
+            const gstAmount = actualAmount * gstRateDecimal;
+            const totalAmount = actualAmount + gstAmount;
+
+            // 3. Display Results using jQuery .text()
+            $('#actual-amount-display').text('$' + actualAmount.toFixed(2));
+            $('#gst-amount-display').text('$' + gstAmount.toFixed(2));
+            $('#total-amount-display').text('$' + totalAmount.toFixed(2));
+        }
+
+        // --- jQuery Document Ready & Event Binding ---
+        $(document).ready(function() {
+            // Attach the calculateGST function to all relevant change/input events using jQuery .on()
+            // 'input' fires instantly when typing in the number box
+            // 'change' fires when selecting a new option in the dropdown box
+            $('#amount-input, #gst-rate').on('change input', calculateGST);
+            
+            // Initial calculation when the page loads
+            calculateGST();
+        });
+    </script>
+
+</body>
+</html>
